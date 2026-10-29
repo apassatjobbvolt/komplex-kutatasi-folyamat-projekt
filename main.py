@@ -28,7 +28,7 @@ def meres(meresszam, meresgyak, hatarmin, hatarmax):
 def ellenorzes(bemenet, meresgyak, hatarmin, hatarmax):
     megfelel = True
     for ertek in bemenet:
-        if type(ertek) != float or type(ertek) !=int:
+        if not (type(ertek) == float or type(ertek) ==int):
             megfelel = False
         if ertek < hatarmin or ertek > hatarmax:
             megfelel = False
@@ -36,11 +36,10 @@ def ellenorzes(bemenet, meresgyak, hatarmin, hatarmax):
         if meresgyak == len(bemenet):
             print("Meresi eredmenyek ellenorzese sikeres.")
         else:
-            print("Meresi eredmeny ellenorzese sikertelen - mert adatok szama nem egyezik a kert adatmennyiseggel. Nyers adatok exportalasa hibatarba...")
-#            exportalas(bemenet, "hibatar")
+            print("Meresi eredmeny ellenorzese sikertelen - mert adatok szama nem egyezik a kert adatmennyiseggel. Nyers adatok exportalasa cache-be...")
     else:
-        print("Meresi eredmenyek ellenorzese sikertelen - mert adatok meresi tartomanyon kivul. Nyers adatok exportalasa hibatarba...")
-#        exportalas(bemenet, "hibatar")
+        print("Meresi eredmenyek ellenorzese sikertelen - mert adatok meresi tartomanyon kivul. Nyers adatok exportalasa cache-be...")
+#   mentcache(bemenet, "cache_ellenorzes") - ez egy fgv. lesz, exportalas fgv-hez hasonlo, csak szotar helyett listat kezel majd (exportalas fuggyveny csak dict-et tud kezelni jelenleg)
     if megfelel != True:
         kerdes = str(input("Folytatas hibas adatokkal? I/N: "))
         while kerdes != "I" or kerdes != "N":
