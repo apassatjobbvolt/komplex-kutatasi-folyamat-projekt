@@ -50,10 +50,10 @@ def cache_betoltes(fajlnev):
 def meres(meresszam, meresgyak, hatarmin, hatarmax):
     mereseredmeny = list()
     for i in range(0,meresszam):
-        mereseredmeny.append(random.randint(int(hatarmin),int(hatarmax)))
+        mereseredmeny.append(random.uniform(float(hatarmin),float(hatarmax)))
+        mentcache(mereseredmeny, "cache_meres")
         time.sleep(meresgyak)
-    print(f"Mert ertekek: {mereseredmeny}")
-    mentcache(mereseredmeny, "cache_meres")
+    print(f"Mert ertekek (szimulalt): {mereseredmeny}")
     return mereseredmeny
 
 # COM port atallitasa (Windows szamitogep eseten) Windows Eszkozkezeloben, illetve helyben is szukseges lehet
@@ -66,16 +66,14 @@ def valosmeres(meresszam, meresgyak, com_port="COM5"):
         for i in range(0,meresszam):
             meroeszkoz.write(b"IP\r\n")
             bemenet = meroeszkoz.readline().decode("ascii").strip()
-            kimenet = float(bemenet[:11].replace("*", " ").strip())
+            kimenet = float(bemenet[:11].strip("*"))
             # meroeszkoz kimeneteben az elso 11 karakter maga a suly, ures karakterek pedig "*"-gal vannak kitoltve
             mereseredmeny.append(kimenet / 1000 * g)
             # meroeszkoz gramm-ban adja meg a mert erteket - atalakitas Newton-ra
-            time.sleep(meresgyak)
 
             # Cache-be mentes meresenkent arra az esetre, ha megszakadna a kapcsolat a meroeszkozzel:
             mentcache(mereseredmeny, "cache_meres")
-    #Teljes meres mentese cache-be
-    mentcache(mereseredmeny, "cache_meres")
+            time.sleep(meresgyak)
     return mereseredmeny
 
 # Ellenorzes
@@ -93,6 +91,7 @@ def ellenorzes(bemenet, meresszam, hatarmin, hatarmax):
         else:
             megfelel = False
             print("Meresi eredmeny ellenorzese sikertelen - mert adatok szama nem egyezik a kert adatmennyiseggel.")
+            print("Amennyiben megszakadt meres eredmenyevel szamol, mellozze ezt a hibat!")
     else:
         print("Meresi eredmenyek ellenorzese sikertelen - mert adatok meresi tartomanyon kivul.")
 
@@ -162,7 +161,7 @@ if mereseredmeny == None:
 
     if apivalaszt == "V":
         meresszam = int(input("Meresek szama: "))
-        meresgyak = int(input("Meresek gyakorisaga (masodpercben!): "))
+        meresgyak = float(input("Meresek gyakorisaga (masodpercben!): "))
         hatarmin = 0.0001 * g
         hatarmax = 6.2 * g
         # hatarmin/hatarmax = eszkoz mereshatara * g = ... [Newton]
@@ -171,7 +170,7 @@ if mereseredmeny == None:
 
     if apivalaszt == "S":
         meresszam = int(input("Szimulalt meresek szama: "))
-        meresgyak = int(input("Szimulalt meresek gyakorisaga (masodpercben!): "))
+        meresgyak = float(input("Szimulalt meresek gyakorisaga (masodpercben!): "))
         hatarmin = float(input("Meresi intervallum minimuma: "))
         hatarmax = float(input("Meresi intervallum maximuma: "))
         mereseredmeny = meres(meresszam, meresgyak, hatarmin, hatarmax)
