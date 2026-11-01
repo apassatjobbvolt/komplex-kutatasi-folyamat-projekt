@@ -114,7 +114,9 @@ def betoltcache(fajlnev):
 # DAG vegrehajto
 
 mereseredmeny = cache_betoltes("cache_meres")
-(meresszam, meresgyak, hatarmin, hatarmax) = cache_betoltes("cache_bemenet")
+
+if mereseredmeny != True:
+    (meresszam, meresgyak, hatarmin, hatarmax) = cache_betoltes("cache_bemenet")
 
 if mereseredmeny == None:
     apivalaszt = str(input("Meres valodi meroeszkozzel (V) vagy szimulalt meres (S)? - V/S: ").upper())
