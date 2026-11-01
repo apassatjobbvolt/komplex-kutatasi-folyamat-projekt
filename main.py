@@ -34,9 +34,9 @@ def cache_betoltes(fajlnev):
     if mereseredmeny != None:
         kerdes = str(input("Folytatas cache-bol? I/N: ").upper())
         while kerdes not in ("I", "N"):
-                    kerdes = str(input("Nem megfelelo bemenet. Folytatas cache-bol? I/N: ").upper())
-                    if kerdes == "I" or kerdes == "N":
-                        break
+                kerdes = str(input("Nem megfelelo bemenet. Folytatas cache-bol? I/N: ").upper())
+                if kerdes == "I" or kerdes == "N":
+                    break
         if kerdes == "I":
             print("Folytatas cache-bol...")
             return mereseredmeny
@@ -115,7 +115,10 @@ def ellenorzes(bemenet, meresszam, hatarmin, hatarmax):
             
 # kiertekeles fgv-k:
 def atlag(bemenet):
-    return sum(bemenet) / len(bemenet)
+    if len(bemenet) != 0:
+        return sum(bemenet) / len(bemenet)
+    else:
+        return 0
 # Min, Max mar letezo fgv-k, fejlesztes kesobbi stadiumaban a kiertekelesi szempontok bovithetok
 
 # exportalas
@@ -161,7 +164,15 @@ if mereseredmeny == None:
 
     if apivalaszt == "V":
         meresszam = int(input("Meresek szama: "))
+        while meresszam < 1:
+            meresszam = int(input("1-Nel kisebb szam nem adhato meg. Meresek szama: "))
+            if meresszam > 1:
+                break
         meresgyak = float(input("Meresek gyakorisaga (masodpercben!): "))
+        while meresgyak < 0:
+            meresgyak = int(input("0-Nal kisebb/egyenlo szam nem adhato meg. Meresek gyakorisaga (masodpercben!): "))
+            if meresgyak > 0:
+                break
         hatarmin = 0.0001 * g
         hatarmax = 6.2 * g
         # hatarmin/hatarmax = eszkoz mereshatara * g = ... [Newton]
@@ -170,9 +181,21 @@ if mereseredmeny == None:
 
     if apivalaszt == "S":
         meresszam = int(input("Szimulalt meresek szama: "))
+        while meresszam < 1:
+            meresszam = int(input("1-Nel kisebb szam nem adhato meg. Szimulalt meresek szama: "))
+            if meresszam > 1:
+                break
         meresgyak = float(input("Szimulalt meresek gyakorisaga (masodpercben!): "))
+        while meresgyak < 0:
+            meresgyak = int(input("0-Nal kisebb/egyenlo szam nem adhato meg. Szimulalt meresek gyakorisaga (masodpercben!): "))
+            if meresgyak > 0:
+                break
         hatarmin = float(input("Meresi intervallum minimuma: "))
         hatarmax = float(input("Meresi intervallum maximuma: "))
+        while hatarmax <= hatarmin:
+            hatarmax = float(input("Megadott maximum ertek kisebb a megadott minimum erteknel. Meresi intervallum maximuma helyesen: "))
+            if hatarmax > hatarmin:
+                break
         mereseredmeny = meres(meresszam, meresgyak, hatarmin, hatarmax)
         mentcache((meresszam, meresgyak, hatarmin, hatarmax), "cache_bemenet")
 
