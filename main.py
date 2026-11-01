@@ -2,6 +2,19 @@ import time
 import random
 import csv
 import json
+import serial
+
+# fontos!
+# cache_betoltes = kulon lepes, felhasznaloi adatbevitelt igenyel
+# beoltcache = segedfuggveny redundancia elkerulese erdekeben
+
+# www.hogentogler.com/images/Ohaus_30268984_Scout_USB_Device_manual.pdf
+# meroeszkoz: OHAUS Scout STX6201 precizios merleg
+# meres: kulonbozo erok vagy valtozo sulyero merese, peldaul:
+# aramlastan - arkhimedesz torvenyenek igazolasa merleggel - meresek vegzese suly mozgatasa kozben, itt a min es max kimenet lesz mervado
+
+# Pontos gravitacios gyorsulas a meres helyen:
+g = 9.81
 
 # DAG fuggosegek
 
@@ -42,6 +55,17 @@ def meres(meresszam, meresgyak, hatarmin, hatarmax):
     print(f"Mert ertekek: {mereseredmeny}")
     mentcache(mereseredmeny, "cache_meres")
     return mereseredmeny
+
+# COM port atallitasa (Windows szamitogep eseten) Windows Eszkozkezeloben, illetve helyben is szukseges lehet
+# mas operacios rendszer eseten tovabbi informacio a meroeszkoz dokumentaciojaban talalhato
+def valosmeres(meresszam, meresgyak, com_port="COM5"):
+    mereseredmeny = list()
+
+    with serial.Serial(port="com_port", baudrate=9600, bytesize=8, parity="N", stopbits=1, timeout=2) as meroeszkoz:
+        meroeszkoz.reset_input_buffer()
+
+        
+        meroeszkoz.write(b"IP\r\n")
 
 # Ellenorzes
 def ellenorzes(bemenet, meresszam, hatarmin, hatarmax):
@@ -115,8 +139,8 @@ def betoltcache(fajlnev):
 
 mereseredmeny = cache_betoltes("cache_meres")
 
-if mereseredmeny != True:
-    (meresszam, meresgyak, hatarmin, hatarmax) = cache_betoltes("cache_bemenet")
+if mereseredmeny != None:
+    (meresszam, meresgyak, hatarmin, hatarmax) = betoltcache("cache_bemenet")
 
 if mereseredmeny == None:
     apivalaszt = str(input("Meres valodi meroeszkozzel (V) vagy szimulalt meres (S)? - V/S: ").upper())
@@ -124,8 +148,18 @@ if mereseredmeny == None:
         kerdes = str(input("Nem megfelelo bemenet. Meres valodi meroeszkozzel (V) vagy szimulalt meres (S)? - V/S: ").upper())
         if kerdes == "V" or kerdes == "S":
             break
+
     if apivalaszt == "V":
-        print("fejlesztes alatt") # itt kesobb a valos api fgv lesz
+        meresszam = int(input("Szimulalt meresek szama: "))
+        meresgyak = int(input("Szimulalt meresek gyakorisaga (ms): "))
+        hatarmin = 0.0001 * g
+        hatarmax = 6.2 * g
+        # hatarmin/hatarmax = eszkoz mereshatara * g = ... [Newton]
+        
+
+        
+        mentcache((meresszam, meresgyak, hatarmin, hatarmax), "cache_bemenet")
+
     if apivalaszt == "S":
         meresszam = int(input("Szimulalt meresek szama: "))
         meresgyak = int(input("Szimulalt meresek gyakorisaga (ms): "))
