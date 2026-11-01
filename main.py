@@ -8,7 +8,6 @@ import json
 dag = {
     "cache_betoltes": [],
     "meres": ["cache_betoltes"],
-    "meres cachebe mentese": ["meres"],
     "ellenorzes": ["meres"],
     "kiertekeles": ["ellenorzes"],
     "exportalas": ["kiertekeles"]
@@ -114,7 +113,8 @@ def betoltcache(fajlnev):
 
 # DAG vegrehajto
 
-mereseredmeny = cache_betoltes()
+mereseredmeny = cache_betoltes("cache_meres")
+(meresszam, meresgyak, hatarmin, hatarmax) = cache_betoltes("cache_bemenet")
 
 if mereseredmeny == None:
     apivalaszt = str(input("Meres valodi meroeszkozzel (V) vagy szimulalt meres (S)? - V/S: ").upper())
@@ -130,9 +130,9 @@ if mereseredmeny == None:
         hatarmin = float(input("Meresi intervallum minimuma: "))
         hatarmax = float(input("Meresi intervallum maximuma: "))
         mereseredmeny = meres(meresszam, meresgyak, hatarmin, hatarmax)
-        mentcache(mereseredmeny)
+        mentcache((meresszam, meresgyak, hatarmin, hatarmax), "cache_bemenet")
 
-folytatas = ellenorzes(meresszam, meresgyak, hatarmin, hatarmax)
+folytatas = ellenorzes(mereseredmeny, meresszam, hatarmin, hatarmax)
 
 if folytatas == False:
     exit()
