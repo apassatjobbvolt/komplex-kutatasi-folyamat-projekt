@@ -61,16 +61,20 @@ def meres(meresszam, meresgyak, hatarmin, hatarmax):
 def valosmeres(meresszam, meresgyak, com_port="COM5"):
     mereseredmeny = list()
 
-    with serial.Serial(port="com_port", baudrate=9600, bytesize=8, parity="N", stopbits=1, timeout=2) as meroeszkoz:
+    with serial.Serial(port=com_port, baudrate=9600, bytesize=8, parity="N", stopbits=1, timeout=2) as meroeszkoz:
         meroeszkoz.reset_input_buffer()
         for i in range(0,meresszam):
             meroeszkoz.write(b"IP\r\n")
-            bemenet = meroeszkoz.readline().decode("ascii").strip().strip()
-            kimenet = float(bemenet[:11]).strip("*")
+            bemenet = meroeszkoz.readline().decode("ascii").strip()
+            kimenet = float(bemenet[:11].replace("*", " ").strip())
             # meroeszkoz kimeneteben az elso 11 karakter maga a suly, ures karakterek pedig "*"-gal vannak kitoltve
-            mereseredmeny.append(kimenet / 1000)
-            # meroeszkoz gramm-ban adja meg a mert erteket - atalakitas kg-ba
+            mereseredmeny.append(kimenet / 1000 * g)
+            # meroeszkoz gramm-ban adja meg a mert erteket - atalakitas Newton-ra
             time.sleep(meresgyak)
+
+            # Cache-be mentes meresenkent arra az esetre, ha megszakadna a kapcsolat a meroeszkozzel:
+            mentcache(mereseredmeny, "cache_meres")
+    #Teljes meres mentese cache-be
     mentcache(mereseredmeny, "cache_meres")
     return mereseredmeny
 
@@ -162,9 +166,7 @@ if mereseredmeny == None:
         hatarmin = 0.0001 * g
         hatarmax = 6.2 * g
         # hatarmin/hatarmax = eszkoz mereshatara * g = ... [Newton]
-        valosmeres(meresszam, meresgyak)
-
-        
+        mereseredmeny = valosmeres(meresszam, meresgyak)       
         mentcache((meresszam, meresgyak, hatarmin, hatarmax), "cache_bemenet")
 
     if apivalaszt == "S":
