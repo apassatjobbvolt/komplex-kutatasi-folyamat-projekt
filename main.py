@@ -49,9 +49,9 @@ def cache_betoltes(fajlnev):
 # Meres, egyellore API szimulalt - meresek szamat, meresek kozotti idot, min es max kimeneti adatokat ker
 def meres(meresszam, meresgyak, hatarmin, hatarmax):
     mereseredmeny = list()
-    for i in range(1,meresszam+1):
+    for i in range(0,meresszam):
         mereseredmeny.append(random.randint(int(hatarmin),int(hatarmax)))
-        time.sleep(meresgyak / 1000)
+        time.sleep(meresgyak)
     print(f"Mert ertekek: {mereseredmeny}")
     mentcache(mereseredmeny, "cache_meres")
     return mereseredmeny
@@ -63,9 +63,16 @@ def valosmeres(meresszam, meresgyak, com_port="COM5"):
 
     with serial.Serial(port="com_port", baudrate=9600, bytesize=8, parity="N", stopbits=1, timeout=2) as meroeszkoz:
         meroeszkoz.reset_input_buffer()
-
-        
-        meroeszkoz.write(b"IP\r\n")
+        for i in range(0,meresszam):
+            meroeszkoz.write(b"IP\r\n")
+            bemenet = meroeszkoz.readline().decode("ascii").strip().strip()
+            kimenet = float(bemenet[:11]).strip("*")
+            # meroeszkoz kimeneteben az elso 11 karakter maga a suly, ures karakterek pedig "*"-gal vannak kitoltve
+            mereseredmeny.append(kimenet / 1000)
+            # meroeszkoz gramm-ban adja meg a mert erteket - atalakitas kg-ba
+            time.sleep(meresgyak)
+    mentcache(mereseredmeny, "cache_meres")
+    return mereseredmeny
 
 # Ellenorzes
 def ellenorzes(bemenet, meresszam, hatarmin, hatarmax):
@@ -150,19 +157,19 @@ if mereseredmeny == None:
             break
 
     if apivalaszt == "V":
-        meresszam = int(input("Szimulalt meresek szama: "))
-        meresgyak = int(input("Szimulalt meresek gyakorisaga (ms): "))
+        meresszam = int(input("Meresek szama: "))
+        meresgyak = int(input("Meresek gyakorisaga (masodpercben!): "))
         hatarmin = 0.0001 * g
         hatarmax = 6.2 * g
         # hatarmin/hatarmax = eszkoz mereshatara * g = ... [Newton]
-        
+        valosmeres(meresszam, meresgyak)
 
         
         mentcache((meresszam, meresgyak, hatarmin, hatarmax), "cache_bemenet")
 
     if apivalaszt == "S":
         meresszam = int(input("Szimulalt meresek szama: "))
-        meresgyak = int(input("Szimulalt meresek gyakorisaga (ms): "))
+        meresgyak = int(input("Szimulalt meresek gyakorisaga (masodpercben!): "))
         hatarmin = float(input("Meresi intervallum minimuma: "))
         hatarmax = float(input("Meresi intervallum maximuma: "))
         mereseredmeny = meres(meresszam, meresgyak, hatarmin, hatarmax)
