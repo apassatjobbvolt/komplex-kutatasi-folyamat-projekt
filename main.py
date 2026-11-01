@@ -3,14 +3,14 @@ import random
 import csv
 import json
 
-# DAG
+# DAG fuggosegek
 
 dag = {
     "cache_betoltes": [],
     "meres": ["cache_betoltes"],
+    "meres cachebe mentese": ["meres"],
     "ellenorzes": ["meres"],
     "kiertekeles": ["ellenorzes"],
-    "nyers_export": ["ellenorzes"],
     "exportalas": ["kiertekeles"]
 }
 
@@ -20,7 +20,7 @@ dag = {
 def cache_betoltes(fajlnev):
     mereseredmeny = betoltcache(fajlnev)
     if mereseredmeny != None:
-        kerdes = str(input("Folytatas cache-bol? I/N: ").upper)
+        kerdes = str(input("Folytatas cache-bol? I/N: ").upper())
         while kerdes not in ("I", "N"):
                     kerdes = str(input("Nem megfelelo bemenet. Folytatas cache-bol? I/N: ").upper())
                     if kerdes == "I" or kerdes == "N":
@@ -83,6 +83,7 @@ def ellenorzes(bemenet, meresszam, hatarmin, hatarmax):
 # kiertekeles fgv-k:
 def atlag(bemenet):
     return sum(bemenet) / len(bemenet)
+# Min, Max mar letezo fgv-k, fejlesztes kesobbi stadiumaban a kiertekelesi szempontok bovithetok
 
 # exportalas
 
@@ -111,10 +112,35 @@ def betoltcache(fajlnev):
     except FileNotFoundError:
         return None
 
-#teszter:
+# DAG vegrehajto
 
-mereseredmeny = meres(10,10,101,140)
-folytatas = ellenorzes(mereseredmeny, 9, 101, 140)
-if folytatas == True:
-    adatok = {"Atlag": atlag(mereseredmeny), "Minimum": min(mereseredmeny), "Maximum": max(mereseredmeny)}
-    exportalas(adatok, "eredmeny")
+mereseredmeny = cache_betoltes()
+
+if mereseredmeny == None:
+    apivalaszt = str(input("Meres valodi meroeszkozzel (V) vagy szimulalt meres (S)? - V/S: ").upper())
+    while apivalaszt not in ("V", "S"):
+        kerdes = str(input("Nem megfelelo bemenet. Meres valodi meroeszkozzel (V) vagy szimulalt meres (S)? - V/S: ").upper())
+        if kerdes == "V" or kerdes == "S":
+            break
+    if apivalaszt == "V":
+        print("fejlesztes alatt") # itt kesobb a valos api fgv lesz
+    if apivalaszt == "S":
+        meresszam = int(input("Szimulalt meresek szama: "))
+        meresgyak = int(input("Szimulalt meresek gyakorisaga (ms): "))
+        hatarmin = float(input("Meresi intervallum minimuma: "))
+        hatarmax = float(input("Meresi intervallum maximuma: "))
+        mereseredmeny = meres(meresszam, meresgyak, hatarmin, hatarmax)
+        mentcache(mereseredmeny)
+
+folytatas = ellenorzes(meresszam, meresgyak, hatarmin, hatarmax)
+
+if folytatas == False:
+    exit()
+
+kiertekeles = {
+    "Atlag": [atlag(mereseredmeny)],
+    "Minimum": [min(mereseredmeny)],
+    "Maximum": [max(mereseredmeny)]
+}
+
+exportalas(kiertekeles, "eredmeny")
