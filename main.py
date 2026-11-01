@@ -8,11 +8,6 @@ import serial
 # cache_betoltes = kulon lepes, felhasznaloi adatbevitelt igenyel
 # beoltcache = segedfuggveny redundancia elkerulese erdekeben
 
-# www.hogentogler.com/images/Ohaus_30268984_Scout_USB_Device_manual.pdf
-# meroeszkoz: OHAUS Scout STX6201 precizios merleg
-# meres: kulonbozo erok vagy valtozo sulyero merese, peldaul:
-# aramlastan - arkhimedesz torvenyenek igazolasa merleggel - meresek vegzese suly mozgatasa kozben, itt a min es max kimenet lesz mervado
-
 # Pontos gravitacios gyorsulas a meres helyen:
 g = 9.81
 
@@ -46,7 +41,7 @@ def cache_betoltes(fajlnev):
     else:
         return None
 
-# Meres, egyellore API szimulalt - meresek szamat, meresek kozotti idot, min es max kimeneti adatokat ker
+# Meres, szimulalt API - meresek szamat, meresek kozotti idot, min es max kimeneti adatokat ker
 def meres(meresszam, meresgyak, hatarmin, hatarmax):
     mereseredmeny = list()
     for i in range(0,meresszam):
